@@ -35,8 +35,6 @@
 @end
 
 @implementation AppLovinBannerCustomEvent
-
-static const BOOL kALLoggingEnabled = YES;
 static NSString *const kALMoPubMediationErrorDomain = @"com.applovin.sdk.mediation.mopub.errorDomain";
 
 static const CGFloat kALBannerHeightOffsetTolerance = 10.0f;
@@ -169,15 +167,12 @@ static NSMutableDictionary<NSString *, ALAdView *> *ALGlobalAdViews;
 
 - (void)log:(NSString *)format, ...
 {
-    if ( kALLoggingEnabled )
-    {
-        va_list valist;
-        va_start(valist, format);
-        NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
-        va_end(valist);
-        
-        MPLogDebug(@"AppLovinBannerCustomEvent : %@", message);
-    }
+    va_list valist;
+    va_start(valist, format);
+    NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
+    va_end(valist);
+    
+    MPLogDebug(@"AppLovinBannerCustomEvent : %@", message);
 }
 
 - (MOPUBErrorCode)toMoPubErrorCode:(int)appLovinErrorCode

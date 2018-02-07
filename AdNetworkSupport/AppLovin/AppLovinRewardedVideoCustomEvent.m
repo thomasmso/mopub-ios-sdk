@@ -31,8 +31,6 @@
 @end
 
 @implementation AppLovinRewardedVideoCustomEvent
-
-static const BOOL kALLoggingEnabled = YES;
 static NSString *const kALMoPubMediationErrorDomain = @"com.applovin.sdk.mediation.mopub.errorDomain";
 
 // A dictionary of Zone -> `ALIncentivizedInterstitialAd` to be shared by instances of the custom event.
@@ -246,15 +244,12 @@ static NSMutableDictionary<NSString *, ALIncentivizedInterstitialAd *> *ALGlobal
 
 - (void)log:(NSString *)format, ...
 {
-    if ( kALLoggingEnabled )
-    {
-        va_list valist;
-        va_start(valist, format);
-        NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
-        va_end(valist);
-        
-        MPLogDebug("@AppLovinRewardedVideoCustomEvent: %@", message);
-    }
+    va_list valist;
+    va_start(valist, format);
+    NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
+    va_end(valist);
+    
+    MPLogDebug(@"AppLovinRewardedVideoCustomEvent: %@", message);
 }
 
 - (MOPUBErrorCode)toMoPubErrorCode:(int)appLovinErrorCode
