@@ -10,6 +10,7 @@
 #import "AppLovinBannerCustomEvent.h"
 #import "MPConstants.h"
 #import "MPError.h"
+#import "MPLogging.h"
 
 #if __has_include(<AppLovinSDK/AppLovinSDK.h>)
     #import <AppLovinSDK/AppLovinSDK.h>
@@ -175,7 +176,7 @@ static NSMutableDictionary<NSString *, ALAdView *> *ALGlobalAdViews;
         NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
         va_end(valist);
         
-        NSLog(@"AppLovinBannerCustomEvent: %@", message);
+        MPLogDebug(@"AppLovinBannerCustomEvent : %@", message);
     }
 }
 
@@ -231,8 +232,6 @@ static NSMutableDictionary<NSString *, ALAdView *> *ALGlobalAdViews;
                                          code: [self.parentCustomEvent toMoPubErrorCode: code]
                                      userInfo: nil];
     [self.parentCustomEvent.delegate bannerCustomEvent: self.parentCustomEvent didFailToLoadAdWithError: error];
-    
-    // TODO: Add support for backfilling on regular ad request if invalid zone entered
 }
 
 #pragma mark - Ad Display Delegate
@@ -287,6 +286,11 @@ static NSMutableDictionary<NSString *, ALAdView *> *ALGlobalAdViews;
 - (void)ad:(ALAd *)ad didFailToDisplayInAdView:(ALAdView *)adView withError:(ALAdViewDisplayErrorCode)code
 {
     [self.parentCustomEvent log: @"Banner failed to display: %ld", code];
+    
+    NSError *error = [NSError errorWithDomain: kALMoPubMediationErrorDomain
+                                         code: [self.parentCustomEvent toMoPubErrorCode: code]
+                                     userInfo: @{NSLocalizedFailureReasonErrorKey : @"Adaptor failed to display banner"}];
+    [self.parentCustomEvent.delegate bannerCustomEvent: self.parentCustomEvent didFailToLoadAdWithError: error];
 }
 
 @end

@@ -12,6 +12,7 @@
 #import "MPNativeAdAdapter.h"
 #import "MPNativeAdConstants.h"
 #import "MPError.h"
+#import "MPLogging.h"
 
 #if __has_include(<AppLovinSDK/AppLovinSDK.h>)
     #import <AppLovinSDK/AppLovinSDK.h>
@@ -102,7 +103,7 @@ static NSString *const kALMoPubMediationErrorDomain = @"com.applovin.sdk.mediati
         NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
         va_end(valist);
         
-        NSLog(@"AppLovinNativeCustomEvent: %@", message);
+        MPLogDebug(@"AppLovinNativeCustomEvent : %@", message);
     }
 }
 

@@ -8,6 +8,7 @@
 
 #import "AppLovinInterstitialCustomEvent.h"
 #import "MPError.h"
+#import "MPLogging.h"
 
 #if __has_include(<AppLovinSDK/AppLovinSDK.h>)
     #import <AppLovinSDK/AppLovinSDK.h>
@@ -64,7 +65,6 @@ static NSObject *ALGlobalInterstitialAdsLock;
     {
         self.zoneIdentifier = DEFAULT_ZONE;
     }
-    
     
     // Check if we already have a preloaded ad for the given zone
     ALAd *preloadedAd = [[self class] dequeueAdForZoneIdentifier: self.zoneIdentifier];
@@ -133,8 +133,6 @@ static NSObject *ALGlobalInterstitialAdsLock;
                                          code: [self toMoPubErrorCode: code]
                                      userInfo: nil];
     [self.delegate interstitialCustomEvent: self didFailToLoadAdWithError: error];
-    
-    // TODO: Add support for backfilling on regular ad request if invalid zone entered
 }
 
 #pragma mark - Ad Display Delegate
@@ -220,7 +218,7 @@ static NSObject *ALGlobalInterstitialAdsLock;
         NSString *message = [[NSString alloc] initWithFormat: format arguments: valist];
         va_end(valist);
         
-        NSLog(@"AppLovinInterstitialCustomEvent: %@", message);
+        MPLogDebug(@"AppLovinInterstitialCustomEvent : %@", message);
     }
 }
 
