@@ -49,6 +49,21 @@ static NSMutableDictionary<NSString *, ALIncentivizedInterstitialAd *> *ALGlobal
 
 #pragma mark - MPRewardedVideoCustomEvent Overridden Methods
 
+// Note: This is optionally called at the publisher's discretion
+- (void)initializeSdkWithParameters:(NSDictionary *)parameters
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        [[ALSdk shared] setPluginVersion: @"MoPub-2.1.0"];
+        
+        // Preload an incentivized ad for default zone
+        ALIncentivizedInterstitialAd *incent = [[ALIncentivizedInterstitialAd alloc] initWithSdk: [ALSdk shared]];
+        [incent preloadAndNotify: nil];
+        ALGlobalIncentivizedInterstitialAds[DEFAULT_ZONE] = incent;
+    });
+}
+
 - (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info
 {
     [self log: @"Requesting AppLovin rewarded video with info: %@", info];
