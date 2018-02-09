@@ -55,6 +55,8 @@ static NSMutableDictionary<NSString *, ALIncentivizedInterstitialAd *> *ALGlobal
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
+        [self log: @"Initializing AppLovin rewarded video..."];
+        
         [[ALSdk shared] setPluginVersion: @"MoPub-2.1.0"];
         
         // Preload an incentivized ad for default zone
