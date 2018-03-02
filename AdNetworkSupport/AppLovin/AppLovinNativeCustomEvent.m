@@ -26,15 +26,14 @@
  * The underlying MP dictionary representing the contents of the native ad.
  */
 @property (nonatomic, readwrite) NSDictionary *properties;
-
 @property (nonatomic, strong) ALNativeAd *nativeAd;
-
 
 - (instancetype)initWithNativeAd:(ALNativeAd *)ad;
 
 @end
 
 @interface AppLovinNativeCustomEvent() <ALNativeAdLoadDelegate>
+@property (nonatomic, strong) ALSdk *sdk;
 @end
 
 @implementation AppLovinNativeCustomEvent
@@ -46,10 +45,10 @@ static NSString *const kALMoPubMediationErrorDomain = @"com.applovin.sdk.mediati
 {
     [[self class] log: @"Requesting AppLovin native ad with info: %@", info];
     
-    [[ALSdk shared] setPluginVersion: @"MoPub-Certified-2.1.0"];
+    self.sdk = [self SDKFromCustomEventInfo: info];
+    [self.sdk setPluginVersion: @"MoPub-Certified-2.1.0"];
     
-    ALNativeAdService *nativeAdService = [ALSdk shared].nativeAdService;
-    [nativeAdService loadNativeAdGroupOfCount: 1 andNotify: self];
+    [self.sdk.nativeAdService loadNativeAdGroupOfCount: 1 andNotify: self];
 }
 
 #pragma mark - Ad Load Delegate
@@ -100,6 +99,19 @@ static NSString *const kALMoPubMediationErrorDomain = @"com.applovin.sdk.mediati
     va_end(valist);
     
     MPLogDebug(@"AppLovinNativeCustomEvent : %@", message);
+}
+
+- (ALSdk *)SDKFromCustomEventInfo:(NSDictionary *)info
+{
+    NSString *SDKKey = info[@"sdk_key"];
+    if ( SDKKey.length > 0 )
+    {
+        return [ALSdk sharedWithKey: SDKKey];
+    }
+    else
+    {
+        return [ALSdk shared];
+    }
 }
 
 @end
