@@ -1,7 +1,7 @@
 //
 //  MenuDisplayable.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -37,11 +37,17 @@ protocol MenuDisplayable {
     
     /**
      Performs an optional selection action for the menu item
-     - Parameter index: Menu item index assumed to be in bounds
+     - Parameter indexPath: Menu item indexPath assumed to be in bounds
      - Parameter tableView: `UITableView` that rendered the item
      - Parameter viewController: Presenting view controller
+     - Returns: `true` if the menu should collapse when selected; `false` otherwise.
      */
-    func didSelect(itemAt index: Int, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Swift.Void
+    func didSelect(itemAt indexPath: IndexPath, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Bool
+    
+    /**
+     Updates the data source if needed.
+     */
+    func updateIfNeeded() -> Swift.Void
     
     // MARK: - Menu Cells
     
@@ -59,7 +65,11 @@ extension MenuDisplayable {
         return false
     }
     
-    func didSelect(itemAt index: Int, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Swift.Void {
+    func didSelect(itemAt indexPath: IndexPath, inTableView tableView: UITableView, presentFrom viewController: UIViewController) -> Bool {
+        return true
+    }
+    
+    func updateIfNeeded() -> Swift.Void {
         return
     }
     

@@ -1,7 +1,7 @@
 //
 //  AdDataSource.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -104,6 +104,16 @@ protocol AdDataSource {
      Optional container view for the ad.
      */
     var adContainerView: UIView? { get }
+    
+    /**
+     Queries if the data source has an ad loaded.
+     */
+    var isAdLoaded: Bool { get }
+    
+    /**
+     Queries if the data source currently requesting an ad.
+     */
+    var isAdLoading: Bool { get }
     
     /**
      Retrieves the display status for the event.

@@ -23,7 +23,7 @@ If you do not remove or disable IAS's and/or Moat’s technology in accordance w
 
 The MoPub SDK supports multiple methods for installing the library in a project.
 
-The current version of the SDK is 5.4.1
+The current version of the SDK is 5.6.0
 
 ### Installation with CocoaPods
 
@@ -56,7 +56,7 @@ $ pod install
 
 MoPub provides a prepackaged archive of the dynamic framework:
 
-- **[MoPub SDK Framework.zip](http://bit.ly/2OV5fiw)**
+- **[MoPub SDK Framework.zip](https://github.com/mopub/mopub-ios-sdk/releases/download/5.6.0/mopub-framework-5.6.0.zip)**
 
   Includes everything you need to serve HTML, MRAID, and Native MoPub advertisements.  Third party ad networks are not included.
 
@@ -66,11 +66,11 @@ Add the dynamic framework to the target's Embedded Binaries section of the Gener
 
 MoPub provides two prepackaged archives of source code:
 
-- **[MoPub Base SDK.zip](http://bit.ly/2bH8ObO)**
+- **[MoPub Base SDK.zip](https://github.com/mopub/mopub-ios-sdk/releases/download/5.6.0/mopub-base-5.6.0.zip)**
 
   Includes everything you need to serve HTML, MRAID, and Native MoPub advertisements.  Third party ad networks are not included.
 
-- **[MoPub Base SDK Excluding Native.zip](http://bit.ly/2bCCgRw)**
+- **[MoPub Base SDK Excluding Native.zip](https://github.com/mopub/mopub-ios-sdk/releases/download/5.6.0/mopub-nonnative-5.6.0.zip)**
 
   Includes everything you need to serve HTML and MRAID advertisements.  Third party ad networks and Native MoPub advertisements are not included.
 
@@ -82,10 +82,14 @@ Integration instructions are available on the [wiki](https://github.com/mopub/mo
 
 Please view the [changelog](https://github.com/mopub/mopub-ios-sdk/blob/master/CHANGELOG.md) for details.
 
+- **Features**
+  - Added `+` button to the Canary sample app allowing manual entry of custom ad units
+
 - **Bug Fixes**
-  - Changed the MoPubSampleApp+Framework target to MoPubSampleApp in the Objective-C Sample App.
-  - Fixed crash when `MPTableViewAdPlacer` makes multiple ad requests within a short amount of time.
-  - Fixed bug with the internal state of rewarded video when the video fails to play.
+  - MRAID orientation, expansion, and resizing edge case bug fixes
+  - MRAID expansion will no longer trigger a click tracking event
+  - MRAID logging no longer spams the device console
+  - Fixed position bug of the Rewarded Video countdown timer when rotating the device after the ad loads
 
 See the [Getting Started Guide](https://github.com/mopub/mopub-ios-sdk/wiki/Getting-Started#app-transport-security-settings) for instructions on setting up ATS in your app.
 

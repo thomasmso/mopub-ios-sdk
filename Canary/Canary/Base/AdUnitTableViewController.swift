@@ -1,16 +1,23 @@
 //
 //  AdUnitTableViewController.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
 
 import UIKit
+import AVFoundation
+
+struct AdUnitTableViewControllerSegueIdentifier {
+    static let ModallyPresentCameraInterfaceSegueIdentifier = "modallyPresentCameraInterfaceViewController"
+    static let ModallyPresentManualEntryInterfaceSegueIdentifier = "modallyPresentManualEntryInterfaceViewController"
+}
 
 class AdUnitTableViewController: UIViewController {
     // Outlets from `Main.storyboard`
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet var addButton: UIBarButtonItem?
     
     // Table data source.
     fileprivate var dataSource: AdUnitDataSource? = nil
@@ -46,7 +53,10 @@ class AdUnitTableViewController: UIViewController {
             return
         }
         
-        splitViewController?.showDetailViewController(destination, sender: self)
+        // Embed the destination ad view controller into a navigation controller so that
+        // pushing onto the navigation stack will work.
+        let navigationController: UINavigationController = UINavigationController(rootViewController: destination)
+        splitViewController?.showDetailViewController(navigationController, sender: self)
     }
     
     /**
@@ -56,6 +66,35 @@ class AdUnitTableViewController: UIViewController {
     public func reloadData() {
         dataSource?.reloadData()
         tableView.reloadData()
+    }
+    
+    // MARK: - IBActions
+    
+    @IBAction func addButtonAction(_ sender: Any) {
+        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: QRCodeCameraInterfaceViewController.defaultMediaType)
+        let showCameraButton = cameraAuthorizationStatus == .authorized || cameraAuthorizationStatus == .notDetermined ? true : false
+        
+        // If camera use is not authorized, show the manual interface without giving a choice
+        if !showCameraButton {
+            performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentManualEntryInterfaceSegueIdentifier, sender: self)
+            return
+        }
+        
+        // If camera use is authorized, show action sheet with a choice between manual interface and camera interface
+        
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        actionSheet.addAction(UIAlertAction(title: "Enter Ad Unit ID Manually", style: .default, handler: { [unowned self] _ in
+            self.performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentManualEntryInterfaceSegueIdentifier, sender: self)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Use QR Code", style: .default, handler: { [unowned self] _ in
+            self.performSegue(withIdentifier: AdUnitTableViewControllerSegueIdentifier.ModallyPresentCameraInterfaceSegueIdentifier, sender: self)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        present(actionSheet, animated: true, completion: nil)
     }
 }
 
@@ -76,6 +115,7 @@ extension AdUnitTableViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        adUnitCell.accessibilityIdentifier = adUnit.id
         adUnitCell.refresh(adUnit: adUnit)
         adUnitCell.setNeedsLayout()
         return adUnitCell

@@ -1,7 +1,7 @@
 //
 //  AdFormat.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -11,7 +11,7 @@ import Foundation
 /**
  Provides a mapping of ad format to a view controller that can render it.
  */
-enum AdFormat: String {
+enum AdFormat: String, CaseIterable {
     /**
      320x50 banner
      */

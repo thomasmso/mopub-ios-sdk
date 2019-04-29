@@ -1,7 +1,7 @@
 //
 //  InterstitialAdDataSource.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -118,6 +118,18 @@ class InterstitialAdDataSource: NSObject, AdDataSource {
     }
     
     /**
+     Queries if the data source has an ad loaded.
+     */
+    var isAdLoaded: Bool {
+        return interstitialAd.ready
+    }
+    
+    /**
+     Queries if the data source currently requesting an ad.
+     */
+    private(set) var isAdLoading: Bool = false
+    
+    /**
      Retrieves the display status for the event.
      - Parameter event: Status event.
      - Returns: A tuple containing the status display title, optional message, and highlighted state.
@@ -152,6 +164,11 @@ class InterstitialAdDataSource: NSObject, AdDataSource {
     // MARK: - Ad Loading
     
     private func loadAd() {
+        guard !isAdLoading else {
+            return
+        }
+        
+        isAdLoading = true
         clearStatus { [weak self] in
             self?.delegate?.adPresentationTableView.reloadData()
         }
@@ -177,6 +194,7 @@ extension InterstitialAdDataSource: MPInterstitialAdControllerDelegate {
     // MARK: - MPInterstitialAdControllerDelegate
     
     func interstitialDidLoadAd(_ interstitial: MPInterstitialAdController!) {
+        isAdLoading = false
         setStatus(for: .didLoad) { [weak self] in
             if let strongSelf = self {
                 strongSelf.loadFailureReason = nil
@@ -186,6 +204,7 @@ extension InterstitialAdDataSource: MPInterstitialAdControllerDelegate {
     }
     
     func interstitialDidFail(toLoadAd interstitial: MPInterstitialAdController!) {
+        isAdLoading = false
         setStatus(for: .didFailToLoad) { [weak self] in
             if let strongSelf = self {
                 // The interstitial load failure doesn't give back an error reason; assume clear response

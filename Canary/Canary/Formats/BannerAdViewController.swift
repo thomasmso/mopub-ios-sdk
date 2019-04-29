@@ -1,7 +1,7 @@
 //
 //  BannerAdViewController.swift
 //
-//  Copyright 2018 Twitter, Inc.
+//  Copyright 2018-2019 Twitter, Inc.
 //  Licensed under the MoPub SDK License Agreement
 //  http://www.mopub.com/legal/sdk-license-agreement/
 //
@@ -37,6 +37,11 @@ class BannerAdViewController: AdTableViewController {
         
         // Invoke the super class to finish loading the view.
         super.viewDidLoad()
+        
+        // Fix the banner height so that Auto Layout will correctly resize the table header.
+        if let header = tableView.tableHeaderView {
+            header.heightAnchor.constraint(equalToConstant: MOPUB_BANNER_SIZE.height).isActive = true
+        }
     }
 }
 
