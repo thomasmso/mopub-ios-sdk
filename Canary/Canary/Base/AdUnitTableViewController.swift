@@ -43,6 +43,12 @@ class AdUnitTableViewController: UIViewController {
         AdUnitTableViewHeader.register(with: tableView)
         tableView.dataSource = self
         tableView.delegate = self
+        
+        // Set up background color for Dark Mode
+        if #available(iOS 13.0, *) {
+            tableView.dragDelegate = self
+            view.backgroundColor = .systemBackground
+        }
     }
     
     // MARK: - Ad Loading
@@ -94,6 +100,15 @@ class AdUnitTableViewController: UIViewController {
         
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
+        if let popoverPresentationController = actionSheet.popoverPresentationController {
+            guard let barButtonItem = sender as? UIBarButtonItem else {
+                assertionFailure("\(#function) sender is not `UIBarButtonItem` as expected")
+                return
+            }
+            // ADF-4094: app will crash if popover source is not set for popover presentation
+            popoverPresentationController.barButtonItem = barButtonItem
+        }
+        
         present(actionSheet, animated: true, completion: nil)
     }
 }
@@ -110,11 +125,11 @@ extension AdUnitTableViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let adUnitCell: AdUnitTableViewCell = tableView.dequeueReusableCell(withIdentifier: AdUnitTableViewCell.reuseId, for: indexPath) as? AdUnitTableViewCell,
-            let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
+        guard let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
             return UITableViewCell()
         }
         
+        let adUnitCell = tableView.dequeueCellFromNib(cellType: AdUnitTableViewCell.self)
         adUnitCell.accessibilityIdentifier = adUnit.id
         adUnitCell.refresh(adUnit: adUnit)
         adUnitCell.setNeedsLayout()
@@ -126,15 +141,12 @@ extension AdUnitTableViewController: UITableViewDelegate {
     // MARK: - UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Intentionally not to deselect cell to help user to keep track of the long list
         guard let adUnit: AdUnit = dataSource?.item(at: indexPath) else {
-            tableView.deselectRow(at: indexPath, animated: true)
             return
         }
         
         loadAd(with: adUnit)
-        
-        // Unselect the row.
-        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -153,5 +165,27 @@ extension AdUnitTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return UITableView.automaticDimension
+    }
+}
+
+// MARK: - UITableViewDragDelegate
+
+@available(iOS 11, *)
+extension AdUnitTableViewController: UITableViewDragDelegate {
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        // Drag & Drop is available since iOS 11, but multi-scene is available since iOS 13.
+        guard
+            #available(iOS 13, *),
+            let adUnit: AdUnit = dataSource?.item(at: indexPath)else {
+            return []
+        }
+        
+        let itemProvider = NSItemProvider()
+        itemProvider.registerObject(adUnit.openAdViewActivity , visibility: .all)
+
+        let dragItem = UIDragItem(itemProvider: itemProvider)
+        dragItem.localObject = adUnit
+        
+        return [dragItem]
     }
 }

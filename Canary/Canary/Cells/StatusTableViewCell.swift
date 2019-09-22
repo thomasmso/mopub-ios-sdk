@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StatusTableViewCell: UITableViewCell {
+final class StatusTableViewCell: UITableViewCell, TableViewCellRegisterable {
     // MARK: - IBOutlets
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var nameLabel: UILabel!
@@ -29,7 +29,11 @@ class StatusTableViewCell: UITableViewCell {
         messageLabel.text = error
         
         // Update text highlighted state
-        nameLabel.textColor = isHighlighted ? .black : .lightGray
+        if #available(iOS 13.0, *) {
+            nameLabel.textColor = isHighlighted ? .label : .secondaryLabel
+        } else {
+            nameLabel.textColor = isHighlighted ? .black : .lightGray
+        }
         accessoryType = isHighlighted ? .checkmark : .none
 
         // Update the visible state of the message label
@@ -37,9 +41,4 @@ class StatusTableViewCell: UITableViewCell {
         
         setNeedsLayout()
     }
-}
-
-extension StatusTableViewCell: TableViewCellRegisterable {
-    // MARK: - TableViewCellRegisterable
-    static private(set) var reuseId: String = "StatusTableViewCell"
 }

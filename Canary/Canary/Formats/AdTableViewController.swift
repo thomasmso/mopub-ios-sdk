@@ -92,6 +92,15 @@ class AdTableViewController: UIViewController, AdViewController {
         
         // Update the title
         title = dataSource.adUnit.name
+        
+        // Add split view controller collapse button if applicable
+        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+        navigationItem.leftItemsSupplementBackButton = true
+        
+        // Set the background color for Dark Mode
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -174,10 +183,7 @@ extension AdTableViewController: UITableViewDataSource {
      Retrieves a table cell that displays the ad unit ID.
      */
     func tableView(_ tableView: UITableView, adUnitIdCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: AdUnitTableViewCell = tableView.dequeueReusableCell(withIdentifier: AdUnitTableViewCell.reuseId, for: indexPath) as? AdUnitTableViewCell else {
-            return UITableViewCell()
-        }
-        
+        let cell = tableView.dequeueCellFromNib(cellType: AdUnitTableViewCell.self)
         cell.accessibilityIdentifier = dataSource.adUnit.id
         cell.accessoryType = .none
         cell.adUnitId.text = dataSource.adUnit.id
@@ -190,10 +196,7 @@ extension AdTableViewController: UITableViewDataSource {
      Retrieves a table cell that displays the keywords of the ad unit.
      */
     func tableView(_ tableView: UITableView, keywordsCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: TextEntryTableViewCell = tableView.dequeueReusableCell(withIdentifier: TextEntryTableViewCell.reuseId, for: indexPath) as? TextEntryTableViewCell else {
-            return UITableViewCell()
-        }
-        
+        let cell = tableView.dequeueCellFromNib(cellType: TextEntryTableViewCell.self)
         cell.refresh(title: "Keywords", text: dataSource.adUnit.keywords) { [weak self] (keywords: String?) in
             self?.dataSource.adUnit.keywords = keywords
         }
@@ -206,10 +209,7 @@ extension AdTableViewController: UITableViewDataSource {
      Retrieves a table cell that displays the user data keywords of the ad unit.
      */
     func tableView(_ tableView: UITableView, userDataKeywordsCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: TextEntryTableViewCell = tableView.dequeueReusableCell(withIdentifier: TextEntryTableViewCell.reuseId, for: indexPath) as? TextEntryTableViewCell else {
-            return UITableViewCell()
-        }
-        
+        let cell = tableView.dequeueCellFromNib(cellType: TextEntryTableViewCell.self)
         cell.refresh(title: "User Data Keywords", text: dataSource.adUnit.userDataKeywords) { [weak self] (piiKeywords: String?) in
             self?.dataSource.adUnit.userDataKeywords = piiKeywords
         }
@@ -222,10 +222,7 @@ extension AdTableViewController: UITableViewDataSource {
      Retrieves a table cell that displays the custom data for the ad unit.
      */
     func tableView(_ tableView: UITableView, customDataCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: TextEntryTableViewCell = tableView.dequeueReusableCell(withIdentifier: TextEntryTableViewCell.reuseId, for: indexPath) as? TextEntryTableViewCell else {
-            return UITableViewCell()
-        }
-        
+        let cell = tableView.dequeueCellFromNib(cellType: TextEntryTableViewCell.self)
         cell.refresh(title: "Custom Data", text: dataSource.adUnit.customData) { [weak self] (customData: String?) in
             self?.dataSource.adUnit.customData = customData
         }
@@ -240,15 +237,14 @@ extension AdTableViewController: UITableViewDataSource {
      Retrieves the ad unit actions cell.
      */
     func tableView(_ tableView: UITableView, actionCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: AdActionsTableViewCell = tableView.dequeueReusableCell(withIdentifier: AdActionsTableViewCell.reuseId, for: indexPath) as? AdActionsTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueCellFromNib(cellType: AdActionsTableViewCell.self)
+        cell.delegate = self
         
         let isAdLoading = dataSource.isAdLoading
         let loadHandler = dataSource.actionHandlers[.load]
         let showHandler = dataSource.actionHandlers[.show]
         let showEnabled = dataSource.isAdLoaded
-        cell.refresh(isAdLoading: isAdLoading, loadAdHandler: loadHandler, showAdHandler: showHandler, showButtonEnabled: showEnabled)
+        cell.refresh(adSize: dataSource.requestedAdSize, isAdLoading: isAdLoading, loadAdHandler: loadHandler, showAdHandler: showHandler, showButtonEnabled: showEnabled)
         return cell
     }
     
@@ -259,9 +255,7 @@ extension AdTableViewController: UITableViewDataSource {
      `dataSource`.
      */
     func tableView(_ tableView: UITableView, eventStatusCellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: StatusTableViewCell = tableView.dequeueReusableCell(withIdentifier: StatusTableViewCell.reuseId, for: indexPath) as? StatusTableViewCell else {
-            return UITableViewCell()
-        }
+        let cell = tableView.dequeueCellFromNib(cellType: StatusTableViewCell.self)
         
         // Update the state of the cell
         let event = dataSource.events[indexPath.row]
@@ -270,6 +264,14 @@ extension AdTableViewController: UITableViewDataSource {
         
         cell.accessibilityIdentifier = status.title
         return cell
+    }
+}
+
+extension AdTableViewController: AdActionsTableViewCellDelegate {
+    // MARK: - AdActionsTableViewCellDelegate
+    
+    func requestedAdSizeUpdated(to size: CGSize) {
+        dataSource.requestedAdSize = size
     }
 }
 
